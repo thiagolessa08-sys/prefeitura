@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import bcrypt from 'bcryptjs'
-import { getDb } from '@/lib/db'
 import { signToken } from '@/lib/auth'
 
-interface Usuario {
-  id: number
-  nome: string
-  email: string
-  senha_hash: string
-}
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@prefeitura.com'
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123'
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,16 +11,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email e senha obrigatórios' }, { status: 400 })
     }
 
-    const db = getDb()
-    const user = db.prepare('SELECT * FROM usuarios WHERE email = ?').get(email) as Usuario | undefined
-
-    if (!user || !bcrypt.compareSync(senha, user.senha_hash)) {
+    if (email !== ADMIN_EMAIL || senha !== ADMIN_PASSWORD) {
       return NextResponse.json({ error: 'Credenciais inválidas' }, { status: 401 })
     }
 
-    const token = signToken({ userId: user.id, email: user.email, nome: user.nome })
+    const token = signToken({ userId: 1, email: ADMIN_EMAIL, nome: 'Administrador' })
 
-    const res = NextResponse.json({ ok: true, nome: user.nome })
+    const res = NextResponse.json({ ok: true, nome: 'Administrador' })
     res.cookies.set('auth_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
