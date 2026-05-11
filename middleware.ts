@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyToken } from '@/lib/auth'
 
 const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/health']
 
@@ -10,8 +9,10 @@ export function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
+  // Verifica apenas existência do cookie — a validação JWT ocorre em Node.js
+  // dentro de cada API route e server component via getSession()
   const token = req.cookies.get('auth_token')?.value
-  if (!token || !verifyToken(token)) {
+  if (!token) {
     if (pathname.startsWith('/api/')) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
