@@ -30,7 +30,7 @@ export default function CatalogoPage() {
     setSelectedEntry(null)
 
     try {
-      const res = await fetch('/api/catalog/build', { method: 'POST' })
+      const res = await fetch('/api/catalog/gerar', { method: 'POST' })
       if (!res.ok) {
         // Lê como texto para evitar crash quando o servidor retorna HTML
         const body = await res.text()
