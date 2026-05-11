@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import type { Catalog, CatalogEntry } from '@/lib/catalog-cache'
+import type { Catalog, CatalogEntry } from '@/lib/catalog-types'
 
 export default function CatalogoPage() {
   const router = useRouter()
@@ -26,47 +26,21 @@ export default function CatalogoPage() {
 
   async function startBuild() {
     setBuilding(true)
-    setLog([])
-    setSelectedEntry(null)
-
+    setLog(['Verificando catálogo...'])
     try {
       const res = await fetch('/api/catalog/gerar', { method: 'POST' })
+      const body = await res.text()
+      let data: Record<string, unknown> = {}
+      try { data = JSON.parse(body) } catch { /* ignore */ }
+
       if (!res.ok) {
-        // Lê como texto para evitar crash quando o servidor retorna HTML
-        const body = await res.text()
-        let msg = `HTTP ${res.status}`
-        try { msg = JSON.parse(body).error ?? msg } catch { msg = body.slice(0, 200) }
-        setLog(prev => [...prev, `❌ ${msg}`])
+        setLog([`❌ ${data.error ?? `HTTP ${res.status}`}`])
         return
       }
-
-      const reader = res.body!.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n')
-        buffer = lines.pop() ?? ''
-
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue
-          const raw = line.slice(6).trim()
-          if (!raw) continue
-          let event: Record<string, unknown>
-          try { event = JSON.parse(raw) } catch { continue }
-          if (event.msg) setLog(prev => [...prev, String(event.msg)])
-          if (event.error) setLog(prev => [...prev, `❌ ${event.error}`])
-          if (event.done) {
-            setLog(prev => [...prev, `✅ Catálogo gerado com ${event.tabelas} tabelas!`])
-            await loadCatalog()
-          }
-        }
-      }
+      setLog([`✅ Catálogo carregado com ${data.tabelas} tabelas!`])
+      await loadCatalog()
     } catch (e) {
-      setLog(prev => [...prev, `❌ ${String(e)}`])
+      setLog([`❌ ${String(e)}`])
     } finally {
       setBuilding(false)
     }
