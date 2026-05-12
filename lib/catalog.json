@@ -60,7 +60,7 @@
         "DIM_BIORC_UNIDADE_GESTORA ON SK_UNIDADE_GESTORA = SK_UNIDADE_GESTORA"
       ],
       "exemplos_query": [
-        "-- Maiores despesas por secretaria no ano corrente:\nSELECT TOP 20\n  i.DS_UO AS secretaria,\n  SUM(f.VL_SALDO_MES_PAGO) AS total_pago,\n  SUM(f.VL_SALDO_MES_LIQUIDADO) AS total_liquidado,\n  SUM(f.VL_SALDO_MES_EMPENHADO) AS total_empenhado\nFROM pref_aruja_sp.FATO_BIORC_MENSAL_INTERVENCAO_DOTACAO f\nJOIN pref_aruja_sp.DIM_BIORC_INSTITUCIONAL i ON f.SK_INSTITUCIONAL = i.SK_INSTITUCIONAL\nJOIN pref_aruja_sp.DIM_BIORC_DATA_CALENDARIO d ON f.SK_DATA_CALENDARIO_MES = d.SK_DATA_CALENDARIO\nWHERE d.NO_ANO = YEAR(NOW())\nGROUP BY i.DS_UO\nORDER BY total_pago DESC",
+        "-- Maiores despesas por secretaria no ano corrente (apenas poder executivo, sem Câmara e sem registros genéricos):\nSELECT TOP 20\n  i.DS_UO AS secretaria,\n  SUM(f.VL_SALDO_MES_PAGO) AS total_pago,\n  SUM(f.VL_SALDO_MES_LIQUIDADO) AS total_liquidado,\n  SUM(f.VL_SALDO_MES_EMPENHADO) AS total_empenhado\nFROM pref_aruja_sp.FATO_BIORC_MENSAL_INTERVENCAO_DOTACAO f\nJOIN pref_aruja_sp.DIM_BIORC_INSTITUCIONAL i ON f.SK_INSTITUCIONAL = i.SK_INSTITUCIONAL\nJOIN pref_aruja_sp.DIM_BIORC_DATA_CALENDARIO d ON f.SK_DATA_CALENDARIO_MES = d.SK_DATA_CALENDARIO\nWHERE d.NO_ANO = YEAR(NOW())\n  AND i.CD_ORGAO = 1\n  AND i.DS_UO <> i.DS_ORGAO\nGROUP BY i.DS_UO\nORDER BY total_pago DESC",
         "-- Despesas mensais do ano corrente:\nSELECT\n  d.NO_ANO_MES,\n  d.DS_MES,\n  SUM(f.VL_SALDO_MES_PAGO) AS total_pago\nFROM pref_aruja_sp.FATO_BIORC_MENSAL_INTERVENCAO_DOTACAO f\nJOIN pref_aruja_sp.DIM_BIORC_DATA_CALENDARIO d ON f.SK_DATA_CALENDARIO_MES = d.SK_DATA_CALENDARIO\nWHERE d.NO_ANO = YEAR(NOW())\nGROUP BY d.NO_ANO_MES, d.DS_MES\nORDER BY d.NO_ANO_MES",
         "-- Maiores fornecedores pagos:\nSELECT TOP 20\n  forn.DS_FORNECEDOR,\n  forn.CD_CPF_CNPJ_FORNECEDOR,\n  SUM(f.VL_SALDO_MES_PAGO) AS total_pago\nFROM pref_aruja_sp.FATO_BIORC_MENSAL_INTERVENCAO_DOTACAO f\nJOIN pref_aruja_sp.DIM_BIORC_FORNECEDOR forn ON f.SK_FORNECEDOR = forn.SK_FORNECEDOR\nJOIN pref_aruja_sp.DIM_BIORC_DATA_CALENDARIO d ON f.SK_DATA_CALENDARIO_MES = d.SK_DATA_CALENDARIO\nWHERE d.NO_ANO = YEAR(NOW())\nGROUP BY forn.DS_FORNECEDOR, forn.CD_CPF_CNPJ_FORNECEDOR\nORDER BY total_pago DESC"
       ]
@@ -71,10 +71,10 @@
       "conceitos": ["secretaria", "orgao", "unidade orcamentaria", "institucional"],
       "colunas_chave": {
         "SK_INSTITUCIONAL": "Chave surrogate — usada para JOIN com tabelas FATO",
-        "CD_ORGAO": "Código do órgão",
-        "DS_ORGAO": "Nome do órgão (ex: PREFEITURA MUNICIPAL DE ARUJÁ)",
+        "CD_ORGAO": "Código do órgão. IMPORTANTE: CD_ORGAO = 1 é o poder executivo (secretarias); CD_ORGAO = 2 é a Câmara Municipal (poder legislativo); valores negativos (-1, -2, -3) são registros sem classificação. Para listar apenas secretarias da prefeitura use: CD_ORGAO = 1",
+        "DS_ORGAO": "Nome do órgão (ex: PREFEITURA MUNICIPAL DE ARUJÁ). ATENÇÃO: quando DS_UO = DS_ORGAO, a linha é um registro genérico do órgão inteiro, não uma secretaria específica — deve ser excluída de rankings por secretaria",
         "CD_UO": "Código da unidade orçamentária (ex: 02.04.00)",
-        "DS_UO": "Nome da unidade orçamentária/secretaria (ex: SECRETARIA MUNICIPAL DE EDUCAÇÃO)",
+        "DS_UO": "Nome da unidade orçamentária/secretaria (ex: SECRETARIA MUNICIPAL DE EDUCAÇÃO). REGRA: para filtrar apenas secretarias reais use: CD_ORGAO = 1 AND DS_UO <> DS_ORGAO",
         "DS_UO_MNEMONICO": "Nome abreviado da secretaria",
         "IC_ATIVO": "Indicador de ativo/inativo"
       },
@@ -84,7 +84,7 @@
         "DIM_BIORC_UNIDADE_GESTORA ON CD_ORGAO = CD_ORGAO"
       ],
       "exemplos_query": [
-        "-- Listar todas as secretarias ativas:\nSELECT CD_UO, DS_UO FROM pref_aruja_sp.DIM_BIORC_INSTITUCIONAL\nWHERE IC_ATIVO = ' '\nORDER BY CD_UO"
+        "-- Listar apenas secretarias do executivo (excluindo Câmara e registros genéricos):\nSELECT CD_UO, DS_UO, DS_ORGAO FROM pref_aruja_sp.DIM_BIORC_INSTITUCIONAL\nWHERE CD_ORGAO = 1 AND DS_UO <> DS_ORGAO\nORDER BY CD_UO"
       ]
     },
     {

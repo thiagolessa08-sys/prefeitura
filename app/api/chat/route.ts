@@ -56,6 +56,16 @@ SINTAXE OBRIGATÓRIA — SYBASE IQ:
 • Se a query falhar: leia o erro, corrija e tente de novo (máx 2 tentativas)
 
 ══════════════════════════════════════════
+REGRAS DE NEGÓCIO — DIM_BIORC_INSTITUCIONAL:
+══════════════════════════════════════════
+• SECRETARIAS da prefeitura = poder executivo: CD_ORGAO = 1 E DS_UO <> DS_ORGAO
+• CD_ORGAO = 2 → Câmara Municipal (poder LEGISLATIVO) — NÃO é secretaria da prefeitura
+• CD_ORGAO negativo (-1, -2, -3) → registros sem classificação — excluir de análises
+• Quando DS_UO = DS_ORGAO → linha genérica do órgão inteiro, NÃO uma secretaria específica
+• SEMPRE que a pergunta for sobre "secretarias" ou "por secretaria":
+    use: AND i.CD_ORGAO = 1 AND i.DS_UO <> i.DS_ORGAO
+
+══════════════════════════════════════════
 COMO RESPONDER:
 ══════════════════════════════════════════
 1. Identifique as tabelas relevantes no schema abaixo
