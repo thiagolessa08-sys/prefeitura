@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth'
 import { agentQuery } from '@/lib/agent'
 import { getSchemaContext } from '@/lib/schema-cache'
 import { getCatalog, catalogToPromptContext } from '@/lib/catalog-cache'
+import { REGRAS_NEGOCIO } from '@/lib/regras-negocio'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -85,6 +86,7 @@ COMO RESPONDER:
 5. Mostre a query SQL usada em bloco \`\`\`sql para o usuário poder reutilizar
 6. Se o dado não existir, diga claramente qual tabela foi consultada e o que encontrou
 
+${REGRAS_NEGOCIO}
 ══════════════════════════════════════════
 ${catalogContext ? catalogContext + '\n\n' : '⚠️  Catálogo semântico não gerado ainda. Acesse /catalogo para gerar.\n\n'}══════════════════════════════════════════
 SCHEMA TÉCNICO COMPLETO — pref_aruja_sp:
