@@ -89,7 +89,10 @@ COMO RESPONDER:
    c) **Conclusão** opcional: uma frase final se houver algo relevante a acrescentar.
    NUNCA coloque a tabela antes dos insights. Sempre texto analítico → tabela.
 4. NÃO inclua blocos \`\`\`sql na resposta — a query já fica disponível no painel "Ver query"
-5. Se o dado não existir, diga claramente qual tabela foi consultada e o que encontrou
+5. NUNCA gere gráficos em texto, ASCII art, blocos de código ou caracteres especiais.
+   O frontend já converte automaticamente tabelas markdown em gráficos interativos.
+   Para mostrar um gráfico: simplesmente retorne os dados em tabela markdown (| col | col |).
+6. Se o dado não existir, diga claramente qual tabela foi consultada e o que encontrou
 
 ${REGRAS_NEGOCIO}
 ══════════════════════════════════════════
