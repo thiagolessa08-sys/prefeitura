@@ -292,38 +292,58 @@ function MarkdownText({ text }: { text: string }) {
 }
 
 function ToolIndicator({ tool }: { tool: ToolEvent }) {
+  const [showSql, setShowSql] = useState(false)
+
   if (tool.done && tool.error) {
     return (
-      <div className="flex items-start gap-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 my-1">
-        <span>✗ Query falhou:</span>
-        <code className="font-mono">{tool.error}</code>
-      </div>
-    )
-  }
-  if (tool.done) {
-    return (
-      <div className="flex items-center gap-2 text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2 my-1">
-        <span>✓</span>
-        <span>{tool.rows} linha{tool.rows !== 1 ? 's' : ''} retornada{tool.rows !== 1 ? 's' : ''}</span>
+      <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 my-1">
+        <div className="flex items-center gap-2">
+          <span>✗ Query falhou:</span>
+          <span className="text-red-500">{tool.error}</span>
+        </div>
         {tool.sql && (
-          <code className="ml-1 text-slate-500 font-mono truncate max-w-xs" title={tool.sql}>
-            {tool.sql.slice(0, 60)}{tool.sql.length > 60 ? '…' : ''}
-          </code>
+          <div className="mt-1">
+            <button onClick={() => setShowSql(v => !v)} className="text-red-400 hover:text-red-600 underline">
+              {showSql ? 'Ocultar query' : 'Ver query'}
+            </button>
+            {showSql && (
+              <pre className="mt-1 bg-slate-900 text-green-300 p-2 rounded text-xs overflow-x-auto font-mono whitespace-pre">
+                {tool.sql}
+              </pre>
+            )}
+          </div>
         )}
       </div>
     )
   }
+
+  if (tool.done) {
+    return (
+      <div className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2 my-1">
+        <div className="flex items-center gap-2">
+          <span>✓</span>
+          <span>{tool.rows} linha{tool.rows !== 1 ? 's' : ''} retornada{tool.rows !== 1 ? 's' : ''}</span>
+          {tool.sql && (
+            <button onClick={() => setShowSql(v => !v)} className="ml-auto text-green-600 hover:text-green-800 underline flex-shrink-0">
+              {showSql ? 'Ocultar query' : 'Ver query'}
+            </button>
+          )}
+        </div>
+        {showSql && tool.sql && (
+          <pre className="mt-2 bg-slate-900 text-green-300 p-2 rounded text-xs overflow-x-auto font-mono whitespace-pre">
+            {tool.sql}
+          </pre>
+        )}
+      </div>
+    )
+  }
+
   return (
-    <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 my-1 animate-pulse">
+    <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 my-1">
       <svg className="w-3.5 h-3.5 animate-spin flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
       </svg>
-      <span>Executando query no Sybase IQ…</span>
-      {tool.sql && (
-        <code className="ml-1 text-amber-600 font-mono truncate max-w-xs" title={tool.sql}>
-          {tool.sql.slice(0, 50)}{tool.sql.length > 50 ? '…' : ''}
-        </code>
-      )}
+      <span>Consultando Sybase IQ…</span>
     </div>
   )
 }
