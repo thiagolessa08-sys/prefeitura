@@ -44,4 +44,23 @@ Query modelo CORRETA para receita com as três colunas:
   WHERE d.NO_ANO = 2025
 
 NUNCA retorne apenas um valor total de receita sem mostrar bruta e líquida separadamente.
+
+## REGRA 2 — COLUNAS CORRETAS de DIM_BIORC_NATUREZA_RECEITA
+
+A tabela DIM_BIORC_NATUREZA_RECEITA NÃO tem coluna "DS_CATEGORIA_RECEITA".
+Use SEMPRE os nomes exatos abaixo:
+
+  • DS_CATEGORIA_ECONOMICA_RECEITA  → categoria econômica (ex: Receitas Correntes)
+  • DS_ORIGEM_RECEITA               → origem (ex: Receita Tributária)
+  • DS_ESPECIE_RECEITA              → espécie (ex: Impostos, Taxas)
+  • DS_ALINEA_RECEITA               → alínea (ex: IPTU, ISS, ITBI)
+  • DS_SUBALINEA_RECEITA            → subalínea (nível mais detalhado)
+  • DS_RUBRICA_RECEITA              → rubrica
+  • DS_NATUREZA_RECEITA             → descrição completa da natureza
+
+Erros comuns a evitar:
+  ✗ nr.DS_CATEGORIA_RECEITA        → não existe
+  ✗ nr.DS_TIPO_RECEITA             → não existe nessa tabela
+  ✓ nr.DS_CATEGORIA_ECONOMICA_RECEITA  → correto
+  ✓ nr.DS_ESPECIE_RECEITA              → correto
 `
