@@ -43,8 +43,8 @@ export default function LoginPage() {
                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">Prefeitura de Arujá</h1>
-          <p className="text-gray-500 text-sm mt-1">Sistema de Analytics Municipal</p>
+          <h1 className="text-2xl font-bold text-gray-800">Analytics Municipal</h1>
+          <p className="text-gray-500 text-sm mt-1">Prefeitura de Arujá</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
